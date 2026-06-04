@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans antialiased selection:bg-blue-500/30 selection:text-blue-200">
 
-    <nav id="navbar" class="fixed w-full bg-White border-b border-white z-50 transition-all duration-500">
+    <nav id="navbar" class="fixed w-full bg-transparent border-b border-transparent z-50 transition-all duration-500">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex-shrink-0 font-extrabold text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
@@ -106,10 +106,10 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <h2 class="reveal text-3xl md:text-4xl font-bold mb-16 text-center text-white tracking-tight">Featured Projects</h2>
             
-            <div class="reveal relative overflow-hidden group">
-                <div id="slider-track" class="flex transition-transform duration-500 ease-out">
+            <div class="reveal relative group">
+                <div id="slider-track" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-8 pt-4">
                     
-                    <div class="w-full flex-shrink-0 px-2 md:px-12">
+                    <div class="w-full flex-shrink-0 snap-center px-2 md:px-12">
                         <div class="bg-slate-900/50 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-2xl border border-slate-800 flex flex-col lg:flex-row gap-10 items-center h-full group/card transition-all duration-500 hover:bg-slate-800/80 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] hover:border-slate-700">
                             
                             <div class="w-full lg:w-1/2 bg-slate-950 rounded-2xl aspect-video flex items-center justify-center border border-slate-800 shadow-inner overflow-hidden relative">
@@ -145,7 +145,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full flex-shrink-0 px-2 md:px-12">
+                    <div class="w-full flex-shrink-0 snap-center px-2 md:px-12">
                         <div class="bg-slate-900/50 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-2xl border border-slate-800 flex flex-col lg:flex-row gap-10 items-center h-full group/card transition-all duration-500 hover:bg-slate-800/80 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(59,130,246,0.3)] hover:border-slate-700">
                             <div class="w-full lg:w-1/2 bg-slate-950 rounded-2xl aspect-video flex items-center justify-center border border-slate-800 shadow-inner overflow-hidden relative">
                                 <div class="absolute inset-0 flex items-center justify-center text-slate-600 font-medium">Project 2 Preview</div>
@@ -243,7 +243,7 @@
     </section>
 
     <footer class="bg-slate-950 py-10 text-center border-t border-slate-900">
-        <p class="text-slate-500 text-sm">&copy; 2026 Romar Vincent M. Macay. </p>
+        <p class="text-slate-500 text-sm">&copy; 2026 Romar Vincent M. Macay.</p>
     </footer>
 
     <script>
@@ -270,7 +270,7 @@
             }
         }
         window.addEventListener("scroll", reveal);
-        reveal(); // Trigger once on load
+        reveal(); 
 
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
@@ -286,58 +286,37 @@
             });
         });
 
-        const track = document.getElementById('slider-track');
+        const slider = document.getElementById('slider-track');
         const prevBtn = document.getElementById('prev-slide');
         const nextBtn = document.getElementById('next-slide');
-        let currentIndex = 0;
-        const slides = track.children.length;
-
-        function updateSlider() {
-            track.style.transform = `translateX(-${currentIndex * 100}%)`;
-            prevBtn.disabled = currentIndex === 0;
-            nextBtn.disabled = currentIndex === slides - 1;
-        }
 
         prevBtn.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateSlider();
-            }
+            const cardWidth = slider.querySelector('div.flex-shrink-0').offsetWidth;
+            slider.scrollBy({ left: -cardWidth, behavior: 'smooth' });
         });
 
         nextBtn.addEventListener('click', () => {
-            if (currentIndex < slides - 1) {
-                currentIndex++;
-                updateSlider();
+            const cardWidth = slider.querySelector('div.flex-shrink-0').offsetWidth;
+            slider.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        });
+
+        slider.addEventListener('scroll', () => {
+            if (slider.scrollLeft <= 5) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'block';
+            }
+
+            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 5) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
             }
         });
 
-        let touchStartX = 0;
-        let touchEndX = 0;
+        slider.dispatchEvent(new Event('scroll'));
 
-        track.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        track.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            if (touchEndX < touchStartX - swipeThreshold && currentIndex < slides - 1) {
-                currentIndex++;
-                updateSlider();
-            }
-            if (touchEndX > touchStartX + swipeThreshold && currentIndex > 0) {
-                currentIndex--;
-                updateSlider();
-            }
-        }
-
-        updateSlider();
-
+        
         document.getElementById('contact-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
